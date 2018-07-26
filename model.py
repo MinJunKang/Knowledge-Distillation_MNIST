@@ -170,12 +170,13 @@ class Small_DNN(object):
 
         return logits
 
-    def Data_Prepare(self,Train_x,Train_y,Valid_x,Valid_y,Soft_targets = None):
+    def Data_Prepare(self,Train_x,Train_y,Valid_x,Valid_y,Soft_targets = None,Soft_targets_v = None):
         self.train_x = Train_x
         self.train_y = Train_y
         self.valid_x = Valid_x
         self.valid_y = Valid_y
         self.soft_targets = Soft_targets
+        self.soft_targets_v = Soft_targets_v
 
         if(self.train_x == [] or self.valid_x == [] or self.train_y == [] or self.valid_y == []):
             print("Data is empty!!\n")
@@ -236,7 +237,7 @@ class Small_DNN(object):
         if(self.trainable == False):
             print("Please call Data Prepare function first!! Data is not prepared\n")
             return
-        if(teacher_flag == True and self.soft_targets == []):
+        if(teacher_flag == True and (self.soft_targets == [] or self.soft_targets_v == [])):
             print("We need teacher's soft_y data for knowledge distillation to student model")
             return
 
@@ -328,10 +329,10 @@ class Small_DNN(object):
         logits = self.Build_Model(hidden_node)
         if(self.Objective == "classifier"):
             prediction = tf.nn.softmax(logits)
-            accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(prediction,1),tf.argmax(self.Y,1)),"float32"),name = "Accuracy")
+            accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(prediction,1),tf.argmax(self.Y,1)),"float32"),name = "Accuracy_classifier")
         else:
             prediction = logits
-            accuracy = tf.reduce_mean(tf.square(prediction - self.Y,name = "squared_accuracy"),name = "Acccuracy")
+            accuracy = tf.reduce_mean(tf.square(prediction - self.Y,name = "squared_accuracy"),name = "Accuracy_regression")
 
         loss = self.loss(logits)
         train_op = tf.train.AdamOptimizer(learning_rate).minimize(loss)
@@ -346,6 +347,7 @@ class Small_DNN(object):
             _,soft_targets = self.get_batch_data(self.train_x,self.soft_targets,batch_size)
         else:
             soft_targets = batch_y
+            soft_targets_v = self.valid_y
 
         test_acc_save = 0;
 
@@ -357,6 +359,7 @@ class Small_DNN(object):
 
         for i in range(self.epoch):
             # Training
+            loss_tank = []
             for j in range(len(batch_x)):
                 _, loss_value, acc,logit = sess.run([train_op,loss,accuracy,logits],feed_dict = {self.X : batch_x[j],
                                                                       self.Y : batch_y[j],
@@ -364,11 +367,12 @@ class Small_DNN(object):
                                                                       self.soft_Y : soft_targets[j],
                                                                       self.softmax_temperature: self.temperature}
                                          )
+                loss_tank.append(acc)
             # Test
             loss_value, predict,test_acc = sess.run([loss,prediction,accuracy],feed_dict = {self.X : self.valid_x,
                                                                           self.Y : self.valid_y,
                                                                           self.flag : teacher_flag,
-                                                                          self.soft_Y : self.valid_y,
+                                                                          self.soft_Y : self.soft_targets_v,
                                                                           self.softmax_temperature: self.temperature}
                                            )
             # Evaulate the accuracy and compare with the previous result to find stop point
@@ -382,6 +386,7 @@ class Small_DNN(object):
                 print("Structure : ",hidden_node)
                 print("Train_parameter = learning_rate : ",learning_rate,"    batch_size : ",batch_size)
                 print("Step : %d    Test_accuracy : %f      Test_loss : %f"% (i+1,test_acc,loss_value))
+                print("Train_accuracy : %f",np.mean(np.asarray(loss_tank)))
                 print("-------------------------------")
             overfit_count += 1
 
@@ -406,9 +411,34 @@ class Small_DNN(object):
 
         # return the result
         return test_acc_save
-    def predict(self,test_x,test_y):
+    def predict(self,args,test_x,test_y,soft_y,flag_):
 
-        sess = tf.Session()
+        with tf.Session() as sess:
+            if not os.path.isfile(os.path.join(dir_best,model_name+".meta")):
+                print("There is no saved meta file")
+                exit(1)
+
+            new_saver = tf.train.import_meta_graph(os.path.join(dir_best,model_name+".meta"))
+            new_saver.restore(sess,tf.train.latest_checkpoint(dir_best))
+    
+
+            graph = tf.get_default_graph()
+            X = graph.get_tensor_by_name("%s_%s" % (self.model_type,"xinput:0"))
+            Y = graph.get_tensor_by_name("%s_%s" % (self.model_type,"yinput:0"))
+            flag = graph.get_tensor_by_name("%s_%s" % (self.model_type,"flag:0"))
+            soft_Y = graph.get_tensor_by_name("%s_%s" % (self.model_type, "softy:0"))
+            softmax_temperature = graph.get_tensor_by_name("%s_%s" % (self.model_type, "softmaxtemperature:0"))
+            new_prec = graph.get_tensor_by_name("Accuracy_classifier:0")
+    
+            
+            test_prec = sess.run(new_prec,feed_dict={X: test_x,
+                                                     Y: test_y, 
+                                                     flag: flag_,
+                                                     soft_Y: soft_y,
+                                                     softmax_temperature: args.temperature})
+            print('test_prec: ',test_prec)
+
+
 
 
 

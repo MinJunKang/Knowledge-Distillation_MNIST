@@ -117,15 +117,16 @@ def main():
     test_x,test_y = dataset.get_train_np()
     valid_x,valid_y = dataset.get_validation_np()
 
-    # Make saving place
-    check_and_makedir(model.dir_tmp,True)
-    check_and_makedir(model.dir_best,True)
-    check_and_makedir(model.dir_log)
-
-    print("\n[Runnning Options]\nTrain Teacher : 1   /   Train Student : 2    /    Train Student without softy : 3\n<You should first train Teacher to get third option>")
+    print("\n[Runnning Options]\nTrain Teacher : 1   /   Train Student : 2    /    Train Student without softy : 3     /     Get Test Accuracy : 4\n<You should first train Teacher to get third option>")
     uinput = input("입력하세요 : ")
 
-    if(int(uinput) == 2 or int(uinput) == 3):
+    # Make saving place
+    if(int(uinput) != 4):
+        check_and_makedir(model.dir_tmp,True)
+        check_and_makedir(model.dir_best,True)
+        check_and_makedir(model.dir_log)
+
+    if(int(uinput) == 2 or int(uinput) == 3 or int(uinput) == 4):
         args_teacher.model_type = "student"
 
     # Train the teacher model
@@ -142,9 +143,9 @@ def main():
         softy_path = os.path.join(model.dir_log,model.softy_file)
 
         if(os.path.isfile(softy_path)==False):
-            soft_y = teacher_model.predict(train_x, args_student.temperature)
-            soft_y_t = teacher_model.predict(test_x, args_student.temperature)
-            soft_y_v = teacher_model.predict(valid_x, args_student.temperature)
+            soft_y = teacher_model.predict(train_x, args_train.temperature)
+            soft_y_t = teacher_model.predict(test_x, args_train.temperature)
+            soft_y_v = teacher_model.predict(valid_x, args_train.temperature)
 
             with open(softy_path,'wb') as mysavedata:
                 pickle.dump([soft_y,soft_y_t,soft_y_v],mysavedata)
@@ -166,9 +167,9 @@ def main():
             print("Verify Teacher State before Training Student")
             teacher_model.run_inference(dataset)
 
-            soft_y = teacher_model.predict(train_x, args_student.temperature)
-            soft_y_t = teacher_model.predict(test_x, args_student.temperature)
-            soft_y_v = teacher_model.predict(valid_x, args_student.temperature)
+            soft_y = teacher_model.predict(train_x, args_train.temperature)
+            soft_y_t = teacher_model.predict(test_x, args_train.temperature)
+            soft_y_v = teacher_model.predict(valid_x, args_train.temperature)
 
             with open(softy_path,'wb') as mysavedata:
                 pickle.dump([soft_y,soft_y_t,soft_y_v],mysavedata)
@@ -181,11 +182,14 @@ def main():
             [soft_y,soft_y_t,soft_y_v] = pickle.load(myloaddata)
 
         student_model = model.Small_DNN("student")
-        student_model.Data_Prepare(train_x,train_y,valid_x,valid_y,soft_y)
+        student_model.Data_Prepare(train_x,train_y,valid_x,valid_y,soft_y,soft_y_v)
+
         if(int(uinput) == 2):
             student_model.Train(args_train,False)
-        else:
+        elif(int(uinput) == 3):
             student_model.Train(args_train,True)
+        else:
+            student_model.predict(args_train,test_x,test_y,soft_y_t,0.0)
     
 
     return 0
