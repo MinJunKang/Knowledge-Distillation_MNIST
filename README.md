@@ -5,16 +5,24 @@ Single Teacher to Single Student model knowledge distillation using DNN Structur
 MNIST - Tensorflow
 
 # Usage
-in the console type 'python3 Python_code.py'
+in the same directory of your code file type 'python ./main.py' in console
 
-You'll have to choose 3 options
+You have 10 options.
 
-First, you have to choose the option 1 to train the Teacher Model. The data will be saved at 'checkpoint' dir and 'logs' dir
-
-Second, you have to choose the option 2 or 3 to train the Student Model. 
-  Option 2 is just training Student Model without using the soft target of Teacher model
-  Option 3 is training Student Model with using the soft target of Teacher model
+1. Train the teacher model
+2. Get soft target with various temperature
+3. Train the student model without using soft targets
+4. Train the student model with soft targets
+5. Get the trained student model with the best accuracy of various models
+6. View training log of student model
+7. View training log of teacher model
+8. Make the DNN student model immediately and test the model
+9. Show the result log data of model that you made in 8 option
+10. From the training log of student model, create excel file and do some analysis
   
 # Programming Language
 Python 3.6
-Tensorflow
+Tensorflow, keras
+
+# OS dependency
+windows 10, ubuntu linux
