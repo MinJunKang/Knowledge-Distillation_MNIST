@@ -28,3 +28,6 @@ Tensorflow, keras
 windows 10, ubuntu linux
 
 # Result
+https://user-images.githubusercontent.com/29685163/49657743-bc343d00-fa83-11e8-8747-5437d2616107.png
+https://user-images.githubusercontent.com/29685163/49657747-be969700-fa83-11e8-99fa-bb2f782c769e.png
+https://user-images.githubusercontent.com/29685163/49657751-c0605a80-fa83-11e8-943b-c479cf9d4ceb.png
