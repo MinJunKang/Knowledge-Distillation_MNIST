@@ -1,5 +1,6 @@
 # Knowledge-Distillation_MNIST
 Single Teacher to Single Student model knowledge distillation using DNN Structure
+
 Paper : https://arxiv.org/abs/1503.02531
 
 # Data
