@@ -27,7 +27,29 @@ Tensorflow, keras
 # OS dependency
 windows 10, ubuntu linux
 
+# Teacher Model
+<div class="imgTopic">
+ <h1 class="title"><a href="#">Teacher model</a></h1>
+ <p class="content"><a href="#"><img src="https://user-images.githubusercontent.com/29685163/49657991-4da3af00-fa84-11e8-958d-6c37505f9c56.png" alt="" width = "675" height ="350"/></a></p>
+</div>
+
+# Student Model
+<div class="imgTopic2">
+ <h1 class="title"><a href="#">Student model</a></h1>
+ <p class="content"><a href="#"><img src="https://user-images.githubusercontent.com/29685163/49657940-2e0c8680-fa84-11e8-88a3-4f15f5e16929.png" alt="" width = "675" height ="350"/></a></p>
+</div>
+
 # Result
-https://user-images.githubusercontent.com/29685163/49657743-bc343d00-fa83-11e8-8747-5437d2616107.png
-https://user-images.githubusercontent.com/29685163/49657747-be969700-fa83-11e8-99fa-bb2f782c769e.png
-https://user-images.githubusercontent.com/29685163/49657751-c0605a80-fa83-11e8-943b-c479cf9d4ceb.png
+<div class="imgTopic3">
+ <h1 class="title"><a href="#">Teacher model's training result</a></h1>
+ <p class="content"><a href="#"><img src="https://user-images.githubusercontent.com/29685163/49657743-bc343d00-fa83-11e8-8747-5437d2616107.png" alt="" width = "675" height ="350"/></a></p>
+</div>
+<div class="imgTopic4">
+ <h1 class="title"><a href="#">Student model's training result</a></h1>
+ <p class="content"><a href="#"><img src="https://user-images.githubusercontent.com/29685163/49657747-be969700-fa83-11e8-99fa-bb2f782c769e.png" alt="" width = "675" height ="350"/></a></p>
+</div>
+<div class="imgTopic5">
+ <h1 class="title"><a href="#">Student model of layer 1(128 hidden layer)'s result</a></h1>
+ <p class="content"><a href="#"><img src="https://user-images.githubusercontent.com/29685163/49657751-c0605a80-fa83-11e8-943b-c479cf9d4ceb.png" alt="" width = "675" height ="350"/></a></p>
+</div>
+
