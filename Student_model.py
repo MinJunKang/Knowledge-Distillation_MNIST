@@ -77,7 +77,7 @@ class Student_model(object):
 
             loss_op_soft = Header.tf.cond(Header.tf.constant(self.flag),
                                         true_fn=lambda: Header.tf.reduce_mean(Header.K.categorical_crossentropy(
-                                           y_true, Header.K.softmax(y_pred / self.temperature))),
+                                           self.soft_true, Header.K.softmax(y_pred / self.temperature))),
                                         false_fn=lambda: 0.0)
         else:
             pred = Header.K.tanh(y_pred)
@@ -85,7 +85,7 @@ class Student_model(object):
             total_loss = Header.tf.reduce_mean(Header.tf.square(pred - y_true))
 
             loss_op_soft = Header.tf.cond(Header.tf.constant(self.flag),
-                                        true_fn=lambda: Header.tf.reduce_mean(Header.tf.square(Header.K.tanh(y_pred/ self.temperature) - y_true)),
+                                        true_fn=lambda: Header.tf.reduce_mean(Header.tf.square(Header.K.tanh(y_pred/ self.temperature) - self.soft_true)),
                                         false_fn=lambda: 0.0)
 
         total_loss += Header.tf.square(self.temperature) * loss_op_soft
@@ -158,6 +158,7 @@ class Student_model(object):
     def Build_DNN(self,hidden_units=[256,256]):
 
         soft_y = Header.l.Input(shape=self.output_shape,name="%s_soft_y" % self.model_name)
+        self.soft_true = soft_y
 
         model = Header.m.Sequential(name = "%s_DNN_Model" % self.model_name)
 
