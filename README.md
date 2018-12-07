@@ -41,6 +41,9 @@ windows 10, ubuntu linux
  <p class="content"><a href="#"><img src="https://user-images.githubusercontent.com/29685163/49657940-2e0c8680-fa84-11e8-88a3-4f15f5e16929.png" alt="" width = "675" height ="350"/></a></p>
 </div>
 
+# Training Method
+Stop Training if overfitting(validation set accuracy doesn't increase) happens more than 50 epochs
+
 # Result
 <div class="imgTopic3">
  <h1 class="title"><a href="#">Teacher model's training result</a></h1>
